@@ -3,16 +3,17 @@ import webbrowser
 import requests
 from requests_oauthlib import OAuth2Session
 
-CLIENT_ID = '1210850089489408052'
-CLIENT_SECRET = 'd5j21x_3kUiMO8slW2W05yEzuRvZypXF'
-REDIRECT_URI = 'http://localhost:5000/callback'
+CLIENT_ID = 'CLIENT_ID'
+CLIENT_SECRET = 'CLIENT_SECRET'
+REDIRECT_URI = 'REDIRECT_URI'
 
 
 def login(client_id, client_secret, redirect_uri) -> str:
     authorization_base_url = 'https://discord.com/api/oauth2/authorize'
     token_url = 'https://discord.com/api/oauth2/token'
 
-    scope = ['email', 'identify', 'voice']
+    scope = ['email', 'identify', 'guilds', 'guilds.members.read',
+             'rpc', 'rpc.video.read', 'rpc.voice.read', 'voice']
 
     vc = OAuth2Session(client_id, redirect_uri=redirect_uri, scope=scope)
 
@@ -29,4 +30,10 @@ def login(client_id, client_secret, redirect_uri) -> str:
 
 
 if __name__ == '__main__':
-    access_token = login(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+    authentication = login(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI)
+    headers = {'Authorization': f'Bearer {authentication["access_token"]}'}
+    user = requests.get('https://discord.com/api/users/@me', headers=headers)
+    guilds = requests.get(
+        'https://discord.com/api/users/@me/guilds', headers=headers)
+    print(user.json())
+    print(guilds.json())
